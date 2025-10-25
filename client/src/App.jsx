@@ -58,19 +58,12 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className="desktop">
-        <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-          <h1>Kaboot - Study Platform</h1>
-          <p>Backend Status: {backendStatus}</p>
-          <FileUpload/>
-          <ReactFlask/>
-        </div>
-        <Routes>
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </div>
-    </Router>
+    <div className = "desktop">
+      <Home/>
+      {/* <FileUpload/>
+      <ReactFlask/> */}
+      <p>Flask connection test: {backendStatus}</p>
+    </div>
   );
 }
 
