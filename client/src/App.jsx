@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import FileUpload from '../component/fileupload';
+import ReactFlask from "../component/reactflask";
 
 function App() {
   const [backendStatus, setBackendStatus] = useState("Checking connection...");
@@ -28,6 +29,7 @@ function App() {
       <h3>flask backend connection test</h3>
       <p>{backendStatus}</p>
       <FileUpload/>
+      <ReactFlask/>
     </div>
   );
 }
