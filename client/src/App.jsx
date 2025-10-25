@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import FileUpload from '../component/fileupload';
+import ReactFlask from "../component/reactflask";
+import './App.css';
 
 function App() {
   const [backendStatus, setBackendStatus] = useState("Checking connection...");
@@ -23,11 +25,14 @@ function App() {
   }, []);
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <div className = "desktop">
+      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
       <h1>calhacks is life</h1>
       <h3>flask backend connection test</h3>
       <p>{backendStatus}</p>
+      </div>
       <FileUpload/>
+      <ReactFlask/>
     </div>
   );
 }

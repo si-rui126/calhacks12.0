@@ -1,6 +1,6 @@
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain import Document
+from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 import openai
@@ -22,7 +22,7 @@ def generate_data_store():
     chunks = split_text(documents)
     save_to_chroma(chunks)
 
-
+# getting all files in the processing/md folder
 def load_documents():
     text_loader_kwargs = {'autodetect_encoding': True}
     loader = DirectoryLoader(DATA_PATH, glob="*.md", loader_cls=TextLoader, loader_kwargs=text_loader_kwargs)

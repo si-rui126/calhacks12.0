@@ -43,7 +43,9 @@ export default function FileUpload() {
   };
 
   return (
-    <div style={{ padding: "2rem", border: "1px solid #ddd", borderRadius: "8px" }}>
+    <div style={{ padding: "2rem", border: "1px solid #ddd", borderRadius: "8px",display: "flex",
+    justifyContent: "center",
+    alignItems: "center"}}>
       <h3>Upload Study Materials</h3>
 
       <form onSubmit={handleSubmit}>
