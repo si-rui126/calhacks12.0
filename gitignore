@@ -1,3 +1,19 @@
-.env/
-py_cache/
+# Environment variables
+.env
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
 venv/
+
+# Node.js
+node_modules
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
