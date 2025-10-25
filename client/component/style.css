@@ -1,0 +1,43 @@
+.classes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 5px;
+  padding: 15px;
+  justify-items: center;
+  align-items: start;
+}
+
+.class-card {
+  padding: 16px;
+  margin: 8px;
+  width: 80%;
+  aspect-ratio: 4/3;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  color: black;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.class-img {
+  
+}
+
+.class-card:hover {
+  background-color: #e0f0ff;
+}
+
+.class-card h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+input{
+  background-color: #ddd;
+  color: black;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  padding: 12px;
+}

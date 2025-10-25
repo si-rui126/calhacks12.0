@@ -1,20 +1,31 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ClassCard from "../component/classcard";
 
 function Classroom() {
-    const navigate = useNavigate();
 
-    const handleSelectClass = (classId) => {
-        navigate("/quiz");
-    };
+    const subjects = [
+        { id: 1, classes: "Calculus 3" },
+        { id: 2, classes: "Physics 2" },
+        { id: 3, classes: "Linear Algebra" },
+        { id: 4, classes: "Biology" },
+    ];
+
+    useEffect(() => {
+        // Simulate fetching from API
+        setTimeout(() => {
+        }, 500);
+    }, []);
 
     return (
-        <div>
-            <h2>My Classes</h2>
-            <button onClick={() => handleSelectClass()}>Calculus 3</button>
-            <button>Subject 2</button>
-            <button>Subject 3</button>
-        </div>
+    <div className="page-container">
+      <h1>My Classes</h1>
+      <div className="classes-grid">
+        {subjects.map((cls) => (
+          <ClassCard id={cls.id} title={cls.classes} onClick={() => handleSelectClass()}/>
+        ))}
+      </div>
+    </div>
 
     );
 }
