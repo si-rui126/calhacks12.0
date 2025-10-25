@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Home from '../pages/home';
 import FileUpload from '../component/fileupload';
 import ReactFlask from "../component/reactflask";
 import './App.css';
@@ -27,12 +28,11 @@ function App() {
   return (
     <div className = "desktop">
       <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>calhacks is life</h1>
-      <h3>flask backend connection test</h3>
-      <p>{backendStatus}</p>
       </div>
-      <FileUpload/>
-      <ReactFlask/>
+      <Home/>
+      {/* <FileUpload/>
+      <ReactFlask/> */}
+      <p>Flask connection test: {backendStatus}</p>
     </div>
   );
 }
