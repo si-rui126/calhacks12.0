@@ -24,10 +24,35 @@ def query_data(query_text):
     CHROMA_PATH = "chroma"
 
     PROMPT_TEMPLATE = """
-    Answer the question based only on the following context:
+    Your job is to generate practice questions using the provided files. The question should be based only on the following context:
 
     {context}
 
+    The generated question should strictly follow this JSON format. In each question, indicate the correct answer by prefixing it with "~~correct~~", incorrect answers with "~~incorrect~~", and short answer responses with "~~shortanswer~~".:
+    {{   
+        "_id": {{
+            "$oid": "68fca83b0d8f68b41edfa9b1"
+        }},
+        "date": "10/25/2025",
+        "subject": "Calculus 3 Unit 2",
+        "quiz_data" : {{
+            "question_1": {{
+                "answer1": "~~correct~~answer1",
+                "answer2": "~~incorrect~~answer2",
+                "answer3": "~~incorrect~~answer2",
+                "answer4": "~~incorrect~~answer2"
+            }},
+            "question_2": {{
+                "answer1": "~~incorrect~~answer1",
+                "answer2": "~~correct~~answer2",
+                "answer3": "~~incorrect~~answer2",
+                "answer4": "~~incorrect~~answer2"
+            }},
+            "question_3": {{
+                "answer1": "~~shortanswer~~answer1"
+            }}
+        }}
+    }}
     ---
 
     Answer the question based on the above context: {question}
@@ -50,7 +75,7 @@ def query_data(query_text):
     prompt = prompt_template.format(context=context_text, question=query_text)
 
     # retrieving response from OpenAI
-    model = ChatOpenAI() # initializing OpenAI model
+    model = ChatOpenAI(max_tokens=2000) # initializing OpenAI model
     response_text = model.invoke(prompt) # querying response from model using formatted prompt
     formatted_response = response_text.content
 
@@ -62,4 +87,4 @@ def query_data(query_text):
 #     query_data()
 
 # test prompt
-# query_data('Can you tell me about elastic load balancing?')
+query_data('Can you tell me about elastic load balancing?')
