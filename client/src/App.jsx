@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import FileUpload from '.component/fileupload';
+import FileUpload from '../component/fileupload';
 
 function App() {
   const [backendStatus, setBackendStatus] = useState("Checking connection...");
