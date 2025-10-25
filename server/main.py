@@ -17,8 +17,35 @@ def chat():
     data = request.get_json()
     user_input = data.get("query", "")
     
-    response = query_data(user_input)
-    formatted_response = str(response.content)
+    # response = query_data(user_input)
+    # formatted_response = str(response.content)
+
+    # demo formatted response for testing (so i don't have to spend credits every time)
+    # to be commented out or deleted in final version
+    formatted_response='''
+    The answer choices should be stored in this format:
+    {
+        "_id":{
+            "$oid": "68facaasdkfl"
+        },
+        "date": "10/25/2025",
+        "subject": "calculus 3",
+        "quiz_data":{
+            "question_1":{
+                "answer1": "~~correct~~answer1",
+                "answer2": "~incorrect~~answer2",
+                "answer3": "~~incorrect~~answer3",
+                "answer4": "~~incorrect~~answer4",
+            },
+            "question_2":{
+                "answer1": "~~correct~~answer1",
+                "answer2": "~incorrect~~answer2",
+                "answer3": "~~incorrect~~answer3",
+                "answer4": "~~incorrect~~answer4",
+            }
+        }
+    }
+    '''
 
     print("user said: "+user_input)
     print("assitant response: "+formatted_response)
