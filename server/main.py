@@ -1,27 +1,6 @@
-from nt import device_encoding
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from flask import send_from_directory
-import os
+from flask import request, jsonify
 from query_data import query_data
-from pymongo import MongoClient
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-try:
-    client = MongoClient(os.getenv("MONGO_URI"))
-    db = client["kaboot"]
-    user_collection = db["users"]
-    quiz_collection = db["quiz-collection"]
-    client.admin.command('ping')
-    print("MongoDB connected successfully!")
-except Exception as e:
-    print("MongoDB connection error:", e)
-
-app = Flask(__name__)
-cors = CORS(app, origins='*')
+from database import app  # Import the Flask app from database.py
 
 @app.route('/')
 def home():
