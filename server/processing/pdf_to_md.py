@@ -6,7 +6,8 @@ md_path = "md"
 
 def pdf_to_md(input_file):
     input_path = os.path.join(pdf_path, input_file)
-    output_path = os.path.join(md_path, input_file[:-5])
+    output_file_name = input_file[:-4]+'.md'
+    output_path = os.path.join(md_path, output_file_name)
     markdown_text = pymupdf4llm.to_markdown(input_path)
     with open(output_path, "w", errors='ignore') as f:
         f.write(markdown_text)
