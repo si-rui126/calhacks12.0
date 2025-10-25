@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import FileUpload from '../component/fileupload';
+import ReactFlask from "../component/reactflask";
 import './App.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
       <p>{backendStatus}</p>
       </div>
       <FileUpload/>
+      <ReactFlask/>
     </div>
   );
 }
