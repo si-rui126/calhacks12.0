@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import FileUpload from "../component/fileupload";
+import Home from '../pages/home';
+import FileUpload from '../component/fileupload';
 import ReactFlask from "../component/reactflask";
 import "./App.css";
 
@@ -51,10 +52,11 @@ function App() {
   return (
     <div className="desktop">
       <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-        <h1>calhacks is life</h1>
-        <FileUpload onFileSelect={handleFileSelected} />
-        <ReactFlask conversionResult={conversionResult} isLoading={loadingConvert} />
       </div>
+      <Home/>
+      {/* <FileUpload/>
+      <ReactFlask/> */}
+      <p>Flask connection test: {backendStatus}</p>
     </div>
   );
 }
