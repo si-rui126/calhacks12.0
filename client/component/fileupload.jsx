@@ -30,6 +30,11 @@ export default function FileUpload() {
           method: "POST",
           body: formData,
         });
+        
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}: ${res.statusText}`);
+        }
+        
         const data = await res.json();
         allResults.push({ file: file.name, result: data });
       } catch (err) {

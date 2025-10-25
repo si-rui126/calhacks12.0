@@ -11,6 +11,3 @@ def pdf_to_md(input_file):
     markdown_text = pymupdf4llm.to_markdown(input_path)
     with open(output_path, "w", errors='ignore') as f:
         f.write(markdown_text)
-
-# Testing the function with dummy pdf
-pdf_to_md("AWS Cloud Practictioner Course Notes.pdf")
