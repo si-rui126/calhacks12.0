@@ -28,7 +28,7 @@ def query_data(query_text):
 
     {context}
 
-    The generated question should strictly follow this JSON format. In each question, indicate the correct answer by prefixing it with "~~correct~~", incorrect answers with "~~incorrect~~", and short answer responses with "~~shortanswer~~". Make each _id unique. and the date should be in MM/DD/YYYY format of the current date.:
+    The generated question should strictly follow this JSON format. In each question, indicate the correct answer by prefixing it with "~~correct~~", incorrect answers with "~~incorrect~~", and short answer responses with "~~shortanswer~~". Make each question unique. and the date should be in MM/DD/YYYY format of the current date.:
     {{   
         "_id": {{
             "$oid": "68fca83b0d8f68b41edfa9b1"

@@ -1,8 +1,9 @@
-from nt import device_encoding
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from query_data import query_data
+from processing.pdf_to_md import pdf_to_md
+from create_database import generate_data_store
 
 app = Flask(__name__)
 cors = CORS(app, origins='*')
@@ -34,8 +35,10 @@ def upload_file():
         try:
             pdf_to_md(filename)  # pdf_to_md expects just the filename, not full path
             result = {"message": f"File {filename} uploaded and processed successfully", "user_id": user_id}
+            print(f"✅ SUCCESS: {filename} processed successfully for user: {user_id}")
         except Exception as e:
             result = {"error": f"Processing error: {str(e)}"}
+            print(f"❌ ERROR: Failed to process {filename} - {str(e)}")
         
         # Clean up temp file
         if os.path.exists(file_path):
@@ -64,11 +67,21 @@ def convert_pdf_to_md_to_response():
         file_path = os.path.join(docs_dir, filename)
         file.save(file_path)
         
+        print(f"📁 File uploaded: {filename} (saved to {file_path})")
+        
         try:
             # Convert PDF to markdown
+            print(f"📄 Converting {filename} to markdown...")
             pdf_to_md(filename)  # pdf_to_md expects just the filename, not full path
             
+            # Update the database with new content
+            print(f"🔄 Updating database with new content...")
+            import time
+            time.sleep(1)  # Small delay to avoid file locking issues
+            generate_data_store()
+            
             # Query the data
+            print(f"🤖 Querying data for {filename}...")
             result = query_data("Generate practice questions from the uploaded content")
             
             response_data = {
@@ -76,8 +89,12 @@ def convert_pdf_to_md_to_response():
                 "query_result": str(result.content) if hasattr(result, 'content') else str(result)
             }
             
+            print(f"✅ SUCCESS: {filename} converted and processed successfully")
+            print(f"📊 Generated quiz data: {str(result.content)[:100]}..." if hasattr(result, 'content') else f"📊 Generated quiz data: {str(result)[:100]}...")
+            
         except Exception as e:
             response_data = {"error": f"Processing error: {str(e)}"}
+            print(f"❌ ERROR: Failed to process {filename} - {str(e)}")
         
         # Clean up temp file
         if os.path.exists(file_path):
@@ -127,21 +144,8 @@ def chat():
     print("assitant response: "+formatted_response)
 
     return jsonify({"response": formatted_response})
-    return jsonify("Flask server is running on port 8080 and i love coding")
     
 
-@app.route("/api/chat", methods=["POST"])
-def chat():
-    data = request.get_json()
-    user_input = data.get("query", "")
-    
-    response = query_data(user_input)
-    formatted_response = str(response.content)
-
-    print("user said: "+user_input)
-    print("assitant response: "+formatted_response)
-
-    return jsonify({"response": formatted_response})
 
 
 @app.route('/api/pdf_to_md_to_response/<pdf>', methods=['GET'])

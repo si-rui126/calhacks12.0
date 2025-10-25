@@ -26,7 +26,7 @@ export default function FileUpload() {
       formData.append("file", file);
 
       try {
-        const res = await fetch("http://127.0.0.1:8080", {
+        const res = await fetch("http://127.0.0.1:8080/convert_pdf_to_md_to_response", {
           method: "POST",
           body: formData,
         });

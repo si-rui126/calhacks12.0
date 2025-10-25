@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from '../pages/home';
 import FileUpload from '../component/fileupload';
 import ReactFlask from "../component/reactflask";
@@ -7,6 +8,7 @@ import "./App.css";
 function App() {
   const [conversionResult, setConversionResult] = useState(null);
   const [loadingConvert, setLoadingConvert] = useState(false);
+  const [backendStatus, setBackendStatus] = useState("Checking...");
 
   useEffect(() => {
     fetch("http://127.0.0.1:8080")
@@ -14,8 +16,14 @@ function App() {
         if (!response.ok) throw new Error("Backend not reachable");
         return response.json();
       })
-      .then((data) => console.log(`Connected to backend: ${data.status}`))
-      .catch((error) => console.error("Error connecting to backend:", error));
+      .then((data) => {
+        console.log(`Connected to backend: ${data.status}`);
+        setBackendStatus("Connected");
+      })
+      .catch((error) => {
+        console.error("Error connecting to backend:", error);
+        setBackendStatus("Disconnected");
+      });
   }, []);
 
   const uploadAndConvert = async (file) => {
@@ -50,14 +58,19 @@ function App() {
   };
 
   return (
-    <div className="desktop">
-      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+    <Router>
+      <div className="desktop">
+        <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+          <h1>Kaboot - Study Platform</h1>
+          <p>Backend Status: {backendStatus}</p>
+          <FileUpload/>
+          <ReactFlask/>
+        </div>
+        <Routes>
+          <Route path="*" element={<Home />} />
+        </Routes>
       </div>
-      <Home/>
-      {/* <FileUpload/>
-      <ReactFlask/> */}
-      <p>Flask connection test: {backendStatus}</p>
-    </div>
+    </Router>
   );
 }
 
