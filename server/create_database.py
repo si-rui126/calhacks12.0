@@ -1,6 +1,6 @@
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.schema import Document
+from langchain import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 import openai
@@ -11,12 +11,11 @@ import shutil
 load_dotenv()
 openai.api_ikey = os.environ['OPENAI_API_KEY']
 
-DATA_PATH = os.path.join('md') # path for user uploaded data
+DATA_PATH = os.path.join('processing', 'md') # path for markdown files
 CHROMA_PATH = 'chroma'
 
 def main():
     generate_data_store()
-
 
 def generate_data_store():
     documents = load_documents()
