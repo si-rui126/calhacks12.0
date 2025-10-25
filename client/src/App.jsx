@@ -27,8 +27,6 @@ function App() {
 
   return (
     <div className = "desktop">
-      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      </div>
       <Home/>
       {/* <FileUpload/>
       <ReactFlask/> */}
