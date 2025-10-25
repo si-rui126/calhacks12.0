@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import Login from "./login";
 import Classroom from "./classroom";
 import Subject from "./subject";
@@ -18,7 +18,6 @@ function Home() {
                 </Routes>
             </Router>
         </div>
-
     );
 }
 
