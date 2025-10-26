@@ -27,33 +27,40 @@ def query_data(query_text):
     CHROMA_PATH = "chroma"
 
     PROMPT_TEMPLATE = """
-    Your job is to generate practice questions using the provided files. The question should be based only on the following context:
+    Your job is to generate a set of 20 collegiate level practice questions using the provided reference materials. The questions should be varied, broad, and be specific enough to convey nuanced conceptual ideas without being unfairly specific. The question should be based only on the following context:
 
     {context}
 
-    The generated question should strictly follow this JSON format. In each question, indicate the correct answer by prefixing it with "~~correct~~", incorrect answers with "~~incorrect~~", and short answer responses with "~~shortanswer~~". Make each question unique. and the date should be in MM/DD/YYYY format of the current date.:
+    The generated question should strictly follow the JSON template format given below. Note that answerA-D should be replaced with actual possible answer choices instead of literally "answerA", and the same should be done for "question_1-20". In each question, you must always indicate the correct answer by prefixing it with "correct~~", incorrect answers with "incorrect~~", and short answer responses with "shortanswer~~".
     {{   
-        "_id": {{
-            "$oid": "68fca83b0d8f68b41edfa9b1"
-        }},
-        "date": "10/25/2025",
-        "subject": "Calculus 3 Unit 2",
         "quiz_data" : {{
             "question_1": {{
-                "answer1": "~~correct~~answer1",
-                "answer2": "~~incorrect~~answer2",
-                "answer3": "~~incorrect~~answer2",
-                "answer4": "~~incorrect~~answer2"
+                "answer1": "correct~~answerA",
+                "answer2": "incorrect~~answerB",
+                "answer3": "incorrect~~answerC",
+                "answer4": "incorrect~~answerD"
             }},
             "question_2": {{
-                "answer1": "~~incorrect~~answer1",
-                "answer2": "~~correct~~answer2",
-                "answer3": "~~incorrect~~answer2",
-                "answer4": "~~incorrect~~answer2"
+                "answer1": "incorrect~~answerA",
+                "answer2": "correct~~answerB",
+                "answer3": "incorrect~~answerC",
+                "answer4": "incorrect~~answerD"
             }},
             "question_3": {{
-                "answer1": "~~shortanswer~~answer1"
-            }}
+                "answer1": "shortanswer~~answer",
+                }}
+            "question_4": {{
+                "answer1": "incorrect~~answerA",
+                "answer2": "correct~~answerB",
+                "answer3": "incorrect~~answerC",
+                "answer4": "incorrect~~answerD"
+            }},
+            'question_5: {{
+                "answer1": "incorrect~~answerA",
+                "answer2": "incorrect~~answerB",
+                "answer3": "incorrect~~answerC",
+                "answer4": "correct~~answerD"
+            }},
         }}
     }}
     ---
