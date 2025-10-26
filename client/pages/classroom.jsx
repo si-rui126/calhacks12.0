@@ -208,7 +208,7 @@ function Classroom() {
 
     if (loading) {
         return (
-            <div className="classroom-container">
+            <div className="general-cont">
                 <div className="classroom-wrapper">
                     <div className="classroom-header">
                         <h1 className="classroom-title">My Classes</h1>
@@ -222,16 +222,16 @@ function Classroom() {
     }
 
     return (
-        <div className="classroom-container">
+        <div className="general-cont">
             <div className="classroom-wrapper">
                 <div className="classroom-header">
-                    <h1 className="classroom-title">My Classes</h1>
+                    <h2 className="classroom-title">My Classes</h2>
                 </div>
                 
                 <div className="classroom-grid">
                     {classes.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '40px', gridColumn: '1 / -1' }}>
-                            <h2>No classes yet. Add your first class below!</h2>
+                            <p>No classes yet. Add your first class below!</p>
                         </div>
                     ) : (
                         classes.map((classItem) => (
