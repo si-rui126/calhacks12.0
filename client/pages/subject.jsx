@@ -45,15 +45,6 @@ function Subject() {
         }
     }, [subject, className]);
 
-    const handleStartQuiz = () => {
-        // Store class and subject info in session storage
-        sessionStorage.setItem('selectedClass', className);
-        sessionStorage.setItem('selectedSubject', subject || 'General');
-        
-        // Navigate to gamescreen
-        navigate('/gamescreen');
-    };
-
     const handleCreateQuiz = async () => {
         if (!subject.trim()) {
             setError("Please enter a subject/topic");
@@ -161,11 +152,20 @@ function Subject() {
             formData.append('file', selectedFile);
             formData.append('user_id', 'demo'); // You can get this from session
 
+            console.log('Uploading file:', selectedFile.name, 'Size:', selectedFile.size, 'Type:', selectedFile.type);
+            console.log('FormData contents:');
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+
             const response = await fetch('http://localhost:8080/api/upload', {
                 method: 'POST',
                 body: formData,
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
             const data = await response.json();
             console.log("Upload response:", data);
 
@@ -291,20 +291,6 @@ function Subject() {
                                                 ID: {quiz.quiz_id || 'No ID'}
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleStartSpecificQuiz(quiz.quiz_id)}
-                                            style={{
-                                                padding: '6px 12px',
-                                                fontSize: '0.9rem',
-                                                backgroundColor: '#2196F3',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '3px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            Start Quiz
-                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -336,21 +322,36 @@ function Subject() {
                     {isCreatingQuiz ? 'Creating Quiz...' : 'Create Quiz'}
                 </button>
                 
-                <button
-                    onClick={handleStartQuiz}
-                    style={{
-                        flex: 1,
-                        padding: '12px',
-                        fontSize: '1rem',
-                        backgroundColor: '#2196F3',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Start Existing Quiz
-                </button>
+                {/* Dropdown for existing quizzes */}
+                <div style={{ flex: 1, position: 'relative' }}>
+                    <select
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                handleStartSpecificQuiz(e.target.value);
+                            }
+                        }}
+                        value=""
+                        style={{
+                            width: '100%',
+                            padding: '12px',
+                            fontSize: '1rem',
+                            backgroundColor: '#2196F3',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <option value="" disabled>
+                            {existingQuizzes.length > 0 ? 'Start Existing Quiz' : 'No Quizzes Available'}
+                        </option>
+                        {existingQuizzes.map((quiz, index) => (
+                            <option key={quiz._id || index} value={quiz.quiz_id} style={{ color: 'black' }}>
+                                Quiz {index + 1} - {quiz.date || 'Unknown Date'}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </div>
 
             <button

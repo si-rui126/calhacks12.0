@@ -14,11 +14,17 @@ def home():
 def upload_file_api():
     """API endpoint for file uploads"""
     try:
+        print(f"Request content type: {request.content_type}")
+        print(f"Request files: {list(request.files.keys())}")
+        print(f"Request form: {dict(request.form)}")
+        
         if 'file' not in request.files:
             return jsonify({"error": "No file provided"}), 400
         
         file = request.files['file']
         user_id = request.form.get('user_id', 'demo')
+        
+        print(f"File received: {file.filename}, User ID: {user_id}")
         
         if file.filename == '':
             return jsonify({"error": "No file selected"}), 400
@@ -30,9 +36,16 @@ def upload_file_api():
         # Save the file to docs directory (where pdf_to_md expects it)
         filename = file.filename
         docs_dir = 'processing/docs'
+        md_dir = 'processing/md'
         os.makedirs(docs_dir, exist_ok=True)
+        os.makedirs(md_dir, exist_ok=True)
         file_path = os.path.join(docs_dir, filename)
         file.save(file_path)
+        
+        print(f"File saved to: {file_path}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Docs directory exists: {os.path.exists(docs_dir)}")
+        print(f"MD directory exists: {os.path.exists(md_dir)}")
         
         # Process the file (convert PDF to markdown)
         try:
@@ -50,6 +63,7 @@ def upload_file_api():
         return jsonify(result)
         
     except Exception as e:
+        print(f"❌ UPLOAD ERROR: {str(e)}")
         return jsonify({"error": f"Upload error: {str(e)}"}), 500
 
 @app.route('/', methods=['POST'])
