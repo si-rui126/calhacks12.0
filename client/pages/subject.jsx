@@ -72,28 +72,10 @@ function Subject() {
             console.log("Quiz created:", data);
 
             if (data.response && data.response.quiz_data) {
-                // Generate unique quiz ID
-                const quizId = `${className}_${subject}_${Date.now()}`;
+                // Quiz is now automatically saved to MongoDB by the backend
+                const quizId = data.response.quiz_id;
                 
-                // Prepare quiz data with ID
-                const quizData = {
-                    ...data.response,
-                    quiz_id: quizId
-                };
-
-                // Save quiz to database
-                const saveResponse = await fetch('http://localhost:8080/api/quizzes', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(quizData),
-                });
-
-                const saveData = await saveResponse.json();
-                console.log("Quiz saved:", saveData);
-
-                if (saveData.success) {
+                if (quizId) {
                     // Store quiz ID and navigate to gamescreen
                     sessionStorage.setItem('selectedClass', className);
                     sessionStorage.setItem('selectedSubject', subject);
@@ -105,7 +87,7 @@ function Subject() {
                     // Navigate to gamescreen
                     navigate('/gamescreen');
                 } else {
-                    setError("Failed to save quiz. Please try again.");
+                    setError("Failed to generate quiz ID. Please try again.");
                 }
             } else {
                 setError("Failed to create quiz. Please try again.");
