@@ -177,7 +177,34 @@ def chat():
     # Use the real query_data function to call OpenAI API
     try:
         response = query_data(user_input, class_name, subject)
-        return jsonify({"response": response})
+        
+        # Check if query_data returned an error
+        if isinstance(response, dict) and "error" in response:
+            return jsonify({"error": response["error"]}), 400
+        
+        # Generate unique quiz ID
+        import time
+        quiz_id = f"{class_name}_{subject}_{int(time.time())}"
+        
+        # Prepare quiz data with ID for MongoDB storage
+        quiz_data = {
+            **response,
+            "quiz_id": quiz_id
+        }
+        
+        # Save quiz to MongoDB
+        from database import insert_quiz
+        save_result = insert_quiz(quiz_data)
+        
+        if save_result["success"]:
+            print(f"✅ Quiz saved to MongoDB with ID: {quiz_id}")
+            # Return the response with the quiz_id for frontend use
+            response["quiz_id"] = quiz_id
+            return jsonify({"response": response})
+        else:
+            print(f"❌ Failed to save quiz to MongoDB: {save_result['error']}")
+            return jsonify({"error": f"Failed to save quiz: {save_result['error']}"}), 500
+            
     except Exception as e:
         print(f"❌ ERROR in query_data: {str(e)}")
         return jsonify({"error": f"Failed to generate quiz: {str(e)}"}), 500
