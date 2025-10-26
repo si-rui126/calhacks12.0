@@ -21,10 +21,6 @@
   transition: background-color 0.2s ease;
 }
 
-.class-img {
-  
-}
-
 .class-card:hover {
   background-color: #e0f0ff;
 }

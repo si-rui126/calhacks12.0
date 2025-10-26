@@ -22,7 +22,7 @@ function Classroom() {
       <h1>My Classes</h1>
       <div className="classes-grid">
         {subjects.map((cls) => (
-          <ClassCard id={cls.id} title={cls.classes} onClick={() => handleSelectClass()}/>
+          <ClassCard key={cls.id} classes={cls.classes} onClick={() => handleSelectClass()}/>
         ))}
       </div>
     </div>
