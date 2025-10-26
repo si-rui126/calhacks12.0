@@ -97,18 +97,6 @@ function Classroom() {
             return;
         }
         
-        // Check if user exists, if not create them
-        try {
-            const checkUser = await fetch(`http://localhost:8080/api/users/${userEmail}`);
-            if (!checkUser.ok) {
-                console.log("User not found, creating new user...");
-                await createTestUser(userEmail);
-            }
-        } catch (error) {
-            console.log("Error checking user, attempting to create...");
-            await createTestUser(userEmail);
-        }
-        
         try {
             console.log("Attempting to add class:", className, "for user:", userEmail);
             
@@ -127,12 +115,49 @@ function Classroom() {
             if (data.success) {
                 setClassName("");
                 console.log("Class added successfully!");
-                // Refresh classes from server
-                await fetchClasses(userEmail);
-                alert("Class added successfully!");
+                
+                // Optimistically update the UI instead of refetching
+                const colorOptions = ["blue-gradient", "green-gradient", "purple-gradient", "orange-gradient", "pink-gradient"];
+                const newClass = {
+                    id: classes.length + 1,
+                    name: className,
+                    color: colorOptions[classes.length % colorOptions.length]
+                };
+                setClasses([...classes, newClass]);
+                
+                // Optional: sync with server in background (non-blocking)
+                fetchClasses(userEmail);
             } else {
                 console.error("Error response:", data);
-                alert(`Error adding class: ${data.error || 'Unknown error'}`);
+                
+                // If user not found, create them and retry once
+                if (data.error && data.error.includes("not found")) {
+                    console.log("User not found, creating user...");
+                    await createTestUser(userEmail);
+                    
+                    // Retry adding the class with a direct API call
+                    const retryResponse = await fetch(`http://localhost:8080/api/users/${userEmail}/classes`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ class_name: className }),
+                    });
+                    const retryData = await retryResponse.json();
+                    
+                    if (retryData.success) {
+                        setClassName("");
+                        const colorOptions = ["blue-gradient", "green-gradient", "purple-gradient", "orange-gradient", "pink-gradient"];
+                        const newClass = {
+                            id: classes.length + 1,
+                            name: className,
+                            color: colorOptions[classes.length % colorOptions.length]
+                        };
+                        setClasses([...classes, newClass]);
+                    } else {
+                        alert(`Error adding class: ${retryData.error || 'Unknown error'}`);
+                    }
+                } else {
+                    alert(`Error adding class: ${data.error || 'Unknown error'}`);
+                }
             }
         } catch (error) {
             console.error("Error adding class:", error);

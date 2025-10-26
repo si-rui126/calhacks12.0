@@ -130,9 +130,9 @@ def add_class_to_user(email, class_name):
             {"$push": {"classes": class_name}}
         )
         
+        # Return success with the class name we just added (no need to query again)
         if result.modified_count > 0:
-            updated_user = user_collection.find_one({"email": email})
-            return {"success": True, "data": updated_user["classes"]}
+            return {"success": True, "class_name": class_name}
         else:
             return {"success": False, "error": "Failed to add class"}
     except Exception as e:
