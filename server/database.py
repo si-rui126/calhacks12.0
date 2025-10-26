@@ -139,6 +139,50 @@ def add_class_to_user(email, class_name):
         print("Add class error:", e)
         return {"success": False, "error": str(e)}
 
+#remove class from user
+def remove_class_from_user(email, class_name):
+    try:
+        # First check if user exists
+        user = user_collection.find_one({"email": email})
+        
+        if not user:
+            return {"success": False, "error": "User not found"}
+        
+        # Remove the class from the classes array
+        result = user_collection.update_one(
+            {"email": email}, 
+            {"$pull": {"classes": class_name}}
+        )
+        
+        if result.modified_count > 0:
+            return {"success": True, "class_name": class_name}
+        else:
+            return {"success": False, "error": "Class not found or already removed"}
+    except Exception as e:
+        print("Remove class error:", e)
+        return {"success": False, "error": str(e)}
+
+#get quizzes by class and subject
+def get_quizzes_by_class_subject(class_name, subject):
+    try:
+        # Find quizzes that match the class and subject
+        query = {}
+        if class_name:
+            query["class"] = class_name
+        if subject:
+            query["subject"] = subject
+        
+        quizzes = list(quiz_collection.find(query).sort("date", -1))  # Sort by date, newest first
+        
+        # Convert ObjectId to string for each quiz
+        for quiz in quizzes:
+            quiz["_id"] = str(quiz["_id"])
+        
+        return {"success": True, "quizzes": quizzes}
+    except Exception as e:
+        print("Get quizzes by class/subject error:", e)
+        return {"success": False, "error": str(e)}
+
 
 # Test functions are commented out since we now have Flask routes
 test = {
@@ -325,6 +369,33 @@ def add_class_route(email):
             return jsonify({"success": False, "error": "Missing 'class_name' in request"}), 400
         
         result = add_class_to_user(email, class_name)
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/users/<email>/classes/<class_name>', methods=['DELETE'])
+def remove_class_route(email, class_name):
+    """Remove a class from user's classes array"""
+    try:
+        result = remove_class_from_user(email, class_name)
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/quizzes/by-class-subject', methods=['GET'])
+def get_quizzes_by_class_subject_route():
+    """Get quizzes by class and subject"""
+    try:
+        class_name = request.args.get('class_name', '')
+        subject = request.args.get('subject', '')
+        
+        result = get_quizzes_by_class_subject(class_name, subject)
         if result['success']:
             return jsonify(result), 200
         else:

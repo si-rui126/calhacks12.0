@@ -13,6 +13,41 @@ function Classroom() {
         navigate(`/subject/${className}`);
     };
 
+    const handleDeleteClass = async (className) => {
+        if (!window.confirm(`Are you sure you want to delete the class "${className}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        if (!userEmail) {
+            alert("No user email found. Please try logging in again.");
+            return;
+        }
+
+        try {
+            // Remove class from user's classes array
+            const response = await fetch(`http://localhost:8080/api/users/${userEmail}/classes/${className}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+            console.log("Delete response:", data);
+
+            if (data.success) {
+                // Update UI by removing the class
+                setClasses(prevClasses => prevClasses.filter(cls => cls.name !== className));
+                alert(`Class "${className}" deleted successfully!`);
+            } else {
+                alert(`Error deleting class: ${data.error || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error("Error deleting class:", error);
+            alert(`Failed to delete class: ${error.message}`);
+        }
+    };
+
     // Fetch classes from the server
     const fetchClasses = async (email) => {
         try {
@@ -200,22 +235,51 @@ function Classroom() {
                         </div>
                     ) : (
                         classes.map((classItem) => (
-                            <button
-                                key={classItem.id}
-                                onClick={() => handleSelectClass(classItem.name)}
-                                className="classButton"
-                            >
-                                <div className={`class-header ${classItem.color}`}>
-                                    <span className="class-icon">
-                                        {classItem.name.charAt(0)}
-                                    </span>
-                                </div>
-                                <div className="class-name-container">
-                                    <h3 className="class-name">
-                                        {classItem.name}
-                                    </h3>
-                                </div>
-                            </button>
+                            <div key={classItem.id} className="class-item-container" style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => handleSelectClass(classItem.name)}
+                                    className="classButton"
+                                    style={{ width: '100%' }}
+                                >
+                                    <div className={`class-header ${classItem.color}`}>
+                                        <span className="class-icon">
+                                            {classItem.name.charAt(0)}
+                                        </span>
+                                    </div>
+                                    <div className="class-name-container">
+                                        <h3 className="class-name">
+                                            {classItem.name}
+                                        </h3>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteClass(classItem.name);
+                                    }}
+                                    className="delete-class-btn"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '5px',
+                                        right: '5px',
+                                        background: '#ff4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '25px',
+                                        height: '25px',
+                                        fontSize: '14px',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        zIndex: 10
+                                    }}
+                                    title="Delete class"
+                                >
+                                    ×
+                                </button>
+                            </div>
                         ))
                     )}
                 </div>

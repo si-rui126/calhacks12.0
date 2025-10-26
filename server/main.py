@@ -10,6 +10,48 @@ from database import app  # Import the Flask app from database.py
 def home():
     return jsonify({"status": "Flask server is running on port 8080 and i love coding"})
 
+@app.route('/api/upload', methods=['POST'])
+def upload_file_api():
+    """API endpoint for file uploads"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+        
+        file = request.files['file']
+        user_id = request.form.get('user_id', 'demo')
+        
+        if file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
+        
+        # Check file type
+        if not file.filename.lower().endswith('.pdf'):
+            return jsonify({"error": "Only PDF files are allowed"}), 400
+        
+        # Save the file to docs directory (where pdf_to_md expects it)
+        filename = file.filename
+        docs_dir = 'processing/docs'
+        os.makedirs(docs_dir, exist_ok=True)
+        file_path = os.path.join(docs_dir, filename)
+        file.save(file_path)
+        
+        # Process the file (convert PDF to markdown)
+        try:
+            pdf_to_md(filename)  # pdf_to_md expects just the filename, not full path
+            result = {"message": f"File {filename} uploaded and processed successfully", "user_id": user_id}
+            print(f"✅ SUCCESS: {filename} processed successfully for user: {user_id}")
+        except Exception as e:
+            result = {"error": f"Processing error: {str(e)}"}
+            print(f"❌ ERROR: Failed to process {filename} - {str(e)}")
+        
+        # Clean up temp file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({"error": f"Upload error: {str(e)}"}), 500
+
 @app.route('/', methods=['POST'])
 def upload_file():
     try:
