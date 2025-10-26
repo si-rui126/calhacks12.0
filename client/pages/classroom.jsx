@@ -211,10 +211,11 @@ function Classroom() {
             <div className="general-cont">
                 <div className="classroom-wrapper">
                     <div className="classroom-header">
-                        <h1 className="classroom-title">My Classes</h1>
+                        <h2 className="classroom-title">My Classes</h2>
                     </div>
                     <div style={{ textAlign: 'center', padding: '40px' }}>
-                        <h2>Loading your classes...</h2>
+                        <p>Loading your classes...</p>
+                        <img src="../src/assets/one-boot.gif" alt="Loading" />
                     </div>
                 </div>
             </div>

@@ -283,7 +283,8 @@ const GameScreenWrapper = () => {
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-gray-900 text-white">
-        <h2 className="text-2xl">Loading quiz...</h2>
+        <p className="text-2xl">Loading quiz...</p>
+        <img src="../src/assets/one-boot.gif" alt="Loading" />
       </div>
     );
   }
