@@ -1,5 +1,9 @@
-input {
-  background-color: rgb(255, 255, 255);
+input{
+  background-color: #ffffff;
+  color: #81635a;
+  border: solid;
+  border-radius: 15px;
+  padding: 12px;
 }
 
 .login-cont{
@@ -23,4 +27,24 @@ input {
   color: #58433d;
   font-family: 'LogoFont', sans-serif;
   font-size: 75px;
+}
+
+.general-cont{
+  width: 70%;
+  border: solid;
+  border-radius: 20px;
+  background-color: #e8d5c2;
+  color: #81635a;
+  margin: auto;
+  padding: 15px;
+}
+
+select{
+  width: 70%;
+  border: solid;
+  border-radius: 20px;
+  background-color: #ffffff;
+  color: #81635a;
+  margin: auto;
+  padding: 15px;
 }

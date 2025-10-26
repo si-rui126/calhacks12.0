@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import "./style.css";
 
 function Subject() {
     const { classes: className } = useParams();
@@ -185,7 +186,7 @@ function Subject() {
     };
 
     return (
-        <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+        <div className="general-cont">
             <h2 style={{ fontSize: '2rem', marginBottom: '20px' }}>{className}</h2>
             
             <div style={{ marginBottom: '20px' }}>
@@ -197,13 +198,7 @@ function Subject() {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="e.g., Derivatives, World War II, Shakespeare"
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        fontSize: '1rem',
-                        border: '2px solid #ccc',
-                        borderRadius: '5px'
-                    }}
+                    style={{ width: '70%' }}
                 />
                 {error && <p style={{ color: 'red', marginTop: '5px' }}>{error}</p>}
             </div>
@@ -216,7 +211,6 @@ function Subject() {
                     type="file"
                     accept=".pdf"
                     onChange={handleFileSelect}
-                    style={{ marginBottom: '10px' }}
                 />
                 {selectedFile && (
                     <div style={{ marginBottom: '10px', fontSize: '0.9rem', color: '#666' }}>
@@ -226,15 +220,6 @@ function Subject() {
                 <button
                     onClick={handleFileUpload}
                     disabled={!selectedFile || isUploading}
-                    style={{
-                        padding: '8px 16px',
-                        fontSize: '0.9rem',
-                        backgroundColor: selectedFile && !isUploading ? '#4CAF50' : '#ccc',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: selectedFile && !isUploading ? 'pointer' : 'not-allowed'
-                    }}
                 >
                     {isUploading ? 'Processing...' : 'Upload & Process'}
                 </button>
@@ -274,7 +259,12 @@ function Subject() {
                                             </div>
                                         </div>
                                     </div>
+
+                                    
+
                                 </div>
+
+                                
                             ))}
                         </div>
                     ) : (
@@ -286,68 +276,48 @@ function Subject() {
                 </div>
             )}
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            {/* Dropdown for existing quizzes */}
+            <div>
+                <select
+                    onChange={(e) => {
+                        if (e.target.value) {
+                            handleStartSpecificQuiz(e.target.value);
+                        }
+                    }}
+                    value=""
+                >
+                    <option value="" disabled>
+                        {existingQuizzes.length > 0 ? 'Start Existing Quiz' : 'No Quizzes Available'}
+                    </option>
+                    {existingQuizzes.map((quiz, index) => (
+                        <option key={quiz._id || index} value={quiz.quiz_id} style={{ color: 'black' }}>
+                            Quiz {index + 1} - {quiz.date || 'Unknown Date'}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div>
                 <button
                     onClick={handleCreateQuiz}
-                    disabled={isCreatingQuiz}
                     style={{
-                        flex: 1,
-                        padding: '12px',
+                        width: '70%',
+                        padding: '10px',
                         fontSize: '1rem',
-                        backgroundColor: isCreatingQuiz ? '#ccc' : '#4CAF50',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: isCreatingQuiz ? 'not-allowed' : 'pointer'
                     }}
+                    disabled={isCreatingQuiz}
                 >
                     {isCreatingQuiz ? 'Creating Quiz...' : 'Create Quiz'}
                 </button>
-                
-                {/* Dropdown for existing quizzes */}
-                <div style={{ flex: 1, position: 'relative' }}>
-                    <select
-                        onChange={(e) => {
-                            if (e.target.value) {
-                                handleStartSpecificQuiz(e.target.value);
-                            }
-                        }}
-                        value=""
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            fontSize: '1rem',
-                            backgroundColor: '#2196F3',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <option value="" disabled>
-                            {existingQuizzes.length > 0 ? 'Start Existing Quiz' : 'No Quizzes Available'}
-                        </option>
-                        {existingQuizzes.map((quiz, index) => (
-                            <option key={quiz._id || index} value={quiz.quiz_id} style={{ color: 'black' }}>
-                                Quiz {index + 1} - {quiz.date || 'Unknown Date'}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+
             </div>
 
             <button
                 onClick={handleSubmitBack}
                 style={{
-                    marginTop: '20px',
-                    width: '100%',
+                    width: '70%',
                     padding: '10px',
                     fontSize: '1rem',
-                    backgroundColor: '#f44336',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer'
                 }}
             >
                 Back to Classes

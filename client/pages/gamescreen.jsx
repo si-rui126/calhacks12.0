@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TriangleIcon, DiamondIcon, CircleIcon, SquareIcon } from '../component/icons';
+import "./style.css";
 
 const QUESTION_TIME = 20;
 

@@ -7,6 +7,11 @@ function Login() {
         navigate("/classroom");
     };
 
+    /** Quick Nav buttons specifically for Marian to navigate around because she can't run the backend for some reason :( **/
+    // const handleQuickNav = () => {
+    //     navigate("/subject/Calculus");
+    // };
+
 
     return (
         <div className="menu-cont">
@@ -20,7 +25,7 @@ function Login() {
                 <p>
                     <input name="Password" placeholder="password"/>
                 </p>
-                {/* <button onClick={handleSubmit}>Enter</button> */}
+                {/* <button onClick={handleQuickNav}>Quick Nav</button> */}
                 <button onClick={handleSubmit}>Enter</button>
             </div>
         </div>
