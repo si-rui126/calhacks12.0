@@ -147,11 +147,11 @@ def convert_pdf_to_md_to_response():
             
             response_data = {
                 "message": f"Converted {filename} to markdown and queried data successfully.",
-                "query_result": str(result.content) if hasattr(result, 'content') else str(result)
+                "query_result": str(result)
             }
             
             print(f"✅ SUCCESS: {filename} converted and processed successfully")
-            print(f"📊 Generated quiz data: {str(result.content)[:100]}..." if hasattr(result, 'content') else f"📊 Generated quiz data: {str(result)[:100]}...")
+            print(f"📊 Generated quiz data: {str(result)[:100]}...")
             
         except Exception as e:
             response_data = {"error": f"Processing error: {str(e)}"}
@@ -176,10 +176,19 @@ def chat():
     # ===== REAL IMPLEMENTATION =====
     # Use the real query_data function to call OpenAI API
     try:
+        print(f"\n{'#'*80}")
+        print(f"🚀 STARTING QUIZ GENERATION")
+        print(f"{'#'*80}")
+        print(f"📝 Query: {user_input}")
+        print(f"🏫 Class: {class_name}")
+        print(f"📚 Subject: {subject}")
+        print(f"{'#'*80}\n")
+        
         response = query_data(user_input, class_name, subject)
         
         # Check if query_data returned an error
         if isinstance(response, dict) and "error" in response:
+            print(f"❌ ERROR from query_data: {response['error']}")
             return jsonify({"error": response["error"]}), 400
         
         # Generate unique quiz ID
@@ -194,10 +203,14 @@ def chat():
         
         # Save quiz to MongoDB
         from database import insert_quiz
+        print(f"\n💾 Saving quiz to MongoDB...")
         save_result = insert_quiz(quiz_data)
         
         if save_result["success"]:
             print(f"✅ Quiz saved to MongoDB with ID: {quiz_id}")
+            print(f"{'#'*80}")
+            print(f"✨ QUIZ GENERATION COMPLETE - ID: {quiz_id}")
+            print(f"{'#'*80}\n")
             # Return the response with the quiz_id for frontend use
             response["quiz_id"] = quiz_id
             return jsonify({"response": response})
@@ -207,6 +220,8 @@ def chat():
             
     except Exception as e:
         print(f"❌ ERROR in query_data: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": f"Failed to generate quiz: {str(e)}"}), 500
     
     # ===== DEMO/PROTOTYPE (saves credits) =====
@@ -280,8 +295,11 @@ def convert_pdf_to_md_to_response_get(pdf):
     except Exception as e:
         return jsonify({"error": f"Query error: {str(e)}"}), 500
 
+    # Convert result to string if it's a dict
+    result_str = result if isinstance(result, str) else str(result)
+    
     return jsonify({
         "message": f"Converted {pdf} to markdown and queried data successfully.",
-        "query_result": str(result)
+        "query_result": result_str
     })
 app.run(port=8080, debug=False, use_reloader=False, threaded=False)

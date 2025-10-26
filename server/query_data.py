@@ -27,13 +27,20 @@ def query_data(query_text, class_name=None, subject=None):
     CHROMA_PATH = "chroma"
 
     PROMPT_TEMPLATE = """
-    RETRUN ONLY VALID JSON. Your entire reply must be a single JSON object. Your job is to generate a set of 20 collegiate level practice questions using the provided reference materials. The questions should be varied, broad, specific enough to convey nuanced conceptual ideas without being unfairly specific. The question should be based only on the following context. Using this context, generate questions that test deep understanding of the material. :
+    You MUST generate EXACTLY 20 questions. You are required to create 20 collegiate level practice questions using the provided reference materials. Do NOT stop early - generate all 20 questions.
 
+    IMPORTANT: You must create question_1, question_2, question_3 ... through question_20. Create EXACTLY 20 questions, no fewer.
+
+    RETURN ONLY VALID JSON. Your entire reply must be a single JSON object with NO additional text before or after it. The questions should be varied, broad, specific enough to convey nuanced conceptual ideas without being unfairly specific. The questions should be based only on the following context. Using this context, generate questions that test deep understanding of the material. 
+
+    Context:
     {context}
 
-    The generated question should strictly follow the JSON template format given below. Note that answerA-D should be replaced with actual possible answer choices instead of literally "answerA", the same should be done for "question_1","questions_2","question_3",. In each question, you must always indicate the correct answer by prefixing it with "correct~~", incorrect answers with "incorrect~~", short answer responses with "shortanswer~~". 
+    The generated questions must strictly follow the JSON template format given below. Note that answerA-D should be replaced with actual possible answer choices instead of literally "answerA", the same should be done for "question_1","question_2","question_3". In each question, you must always indicate the correct answer by prefixing it with "correct~~", incorrect answers with "incorrect~~". 
     
-    With the set of questions that you generated, label each question as "question_1", "question_2", etc. Each question must have 4 answer choices following JSON format. Remeber to replace the placeholder text with actual questions and answers you generate based on the context, do not put questions that you generated into answer choices. :
+    You MUST generate exactly 20 questions labeled as "question_1", "question_2", "question_3", ... "question_20". Each question must have 4 answer choices following JSON format. 
+    
+    Start your response with {{ (opening brace) and end with }} (closing brace). Return ONLY the JSON, nothing else.
    {{
   "quiz_data": {{
     "question_1": {{
@@ -105,21 +112,43 @@ def query_data(query_text, class_name=None, subject=None):
     prompt = prompt_template.format(context=context_text, question=query_text)
 
     # retrieving response from OpenAI
-    model = ChatOpenAI(max_tokens=2000) # initializing OpenAI model
+    print("\n🤖 Calling OpenAI API to generate quiz...")
+    # max_tokens needs to be high enough for 20 questions with full answers
+    # Each question with 4 answers can be ~300-400 tokens, so 20 questions needs ~8000 tokens
+    # Using GPT-4 for better JSON generation and adherence to requirements
+    model = ChatOpenAI(
+        model="gpt-4o-mini",  # Use gpt-4o-mini which is cheaper and better for structured outputs
+        max_tokens=8000, 
+        temperature=0.7
+    )
     response_text = model.invoke(prompt) # querying response from model using formatted prompt
     formatted_response = response_text.content
+    print(f"📥 Raw response received ({len(formatted_response)} chars)")
+    print(f"   First 200 chars: {formatted_response[:200]}...")
+    print(f"   Last 200 chars: ...{formatted_response[-200:]}")
    
-    # Parse the formatted response (should be valid JSON)
+    # Clean the response to extract just the JSON
+    # Sometimes LLMs add markdown code blocks or extra text
+    import re
+    
+    # Try to find JSON within markdown code blocks
+    json_in_markdown = re.search(r'```(?:json)?\s*(\{.*\})\s*```', formatted_response, re.DOTALL)
+    if json_in_markdown:
+        formatted_response = json_in_markdown.group(1)
+    
+    # Try to find JSON object in the response
+    json_match = re.search(r'\{.*\}', formatted_response, re.DOTALL)
+    if json_match:
+        formatted_response = json_match.group()
+    
+    # Parse the JSON
     try:
         quiz_data_json = json.loads(formatted_response)
-    except json.JSONDecodeError:
-        # If it's not valid JSON, try to extract JSON from the response
-        import re
-        json_match = re.search(r'\{.*\}', formatted_response, re.DOTALL)
-        if json_match:
-            quiz_data_json = json.loads(json_match.group())
-        else:
-            return {"error": "Invalid response format from OpenAI"}
+        print("✅ JSON parsed successfully")
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parsing error: {str(e)}")
+        print(f"Response content (first 500 chars): {formatted_response[:500]}")
+        return {"error": f"Invalid JSON response from OpenAI: {str(e)}"}
     
     # Add header information with date, class, and subject
     from datetime import datetime
@@ -130,16 +159,69 @@ def query_data(query_text, class_name=None, subject=None):
         "subject": subject if subject else ""  # Subject from user input
     }
     
+    # The LLM should return JSON with nested quiz_data structure
+    # Extract the quiz_data from the response
+    if "quiz_data" in quiz_data_json:
+        quiz_data = quiz_data_json["quiz_data"]
+    else:
+        # If the LLM returned the data directly without nesting, use it
+        quiz_data = quiz_data_json
+    
     # Merge header with quiz data to create complete response
     complete_response = {
         "date": header_json["date"],
         "class": header_json["class"],
         "subject": header_json["subject"],
-        "quiz_data": quiz_data_json.get("quiz_data", {})
+        "quiz_data": quiz_data
     }
 
-    print("Complete response:", complete_response)
-
+    # Validate that quiz_data has the expected structure
+    if not isinstance(quiz_data, dict):
+        print(f"Warning: quiz_data is not a dict, got {type(quiz_data)}")
+        return {"error": "Quiz data format is invalid"}
+    
+    # Check that we have questions
+    question_count = len([k for k in quiz_data.keys() if k.startswith("question_")])
+    print(f"\n{'='*80}")
+    print(f"📊 Checking generated quiz...")
+    print(f"   Found: {question_count} questions")
+    print(f"{'='*80}")
+    
+    # Warning if we don't have 20 questions
+    if question_count < 20:
+        print(f"⚠️  WARNING: Only {question_count} questions generated, expected 20!")
+        print(f"   This might be due to max_tokens being too low or the model stopping early.")
+        print(f"   Available questions will be used.")
+    elif question_count > 20:
+        print(f"⚠️  WARNING: {question_count} questions generated, more than expected 20!")
+    
+    print(f"\n{'='*80}")
+    print(f"✅ QUIZ GENERATED!")
+    print(f"{'='*80}")
+    print(f"📊 Total questions: {question_count}")
+    print(f"📅 Date: {header_json['date']}")
+    print(f"🏫 Class: {header_json['class'] or '(None)'}")
+    print(f"📚 Subject: {header_json['subject'] or '(None)'}")
+    print(f"{'='*80}\n")
+    
+    # Print all questions and answers
+    print("📝 GENERATED QUESTIONS:\n")
+    for i, (key, question_data) in enumerate(sorted(quiz_data.items()), 1):
+        if key.startswith("question_"):
+            print(f"\nQuestion {i}:")
+            print(f"  Q: {question_data.get('question', 'No question text')}")
+            print(f"  Answers:")
+            for ans_key, ans_value in question_data.get('answers', {}).items():
+                # Show prefix status
+                if ans_value.startswith('correct~~'):
+                    print(f"    ✓ {ans_key}: {ans_value.replace('correct~~', '')}")
+                elif ans_value.startswith('incorrect~~'):
+                    print(f"    ✗ {ans_key}: {ans_value.replace('incorrect~~', '')}")
+                else:
+                    print(f"    ? {ans_key}: {ans_value}")
+    
+    print(f"\n{'='*80}\n")
+    
     return complete_response
 
 # if __name__ == "__main__":
