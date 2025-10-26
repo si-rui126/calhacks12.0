@@ -27,34 +27,45 @@ def query_data(query_text, class_name=None, subject=None):
     CHROMA_PATH = "chroma"
 
     PROMPT_TEMPLATE = """
-    Your job is to generate a set of 20 collegiate level practice questions using the provided reference materials. The questions should be varied, broad, specific enough to convey nuanced conceptual ideas without being unfairly specific. The question should be based only on the following context. Using this context, generate questions that test deep understanding of the material. :
+    RETRUN ONLY VALID JSON. Your entire reply must be a single JSON object. Your job is to generate a set of 20 collegiate level practice questions using the provided reference materials. The questions should be varied, broad, specific enough to convey nuanced conceptual ideas without being unfairly specific. The question should be based only on the following context. Using this context, generate questions that test deep understanding of the material. :
 
     {context}
 
-    The generated question should strictly follow the JSON template format given below. Note that answerA-D should be replaced with actual possible answer choices instead of literally "answerA", the same should be done for "question_1-20". In each question, you must always indicate the correct answer by prefixing it with "correct~~", incorrect answers with "incorrect~~", short answer responses with "shortanswer~~". 
+    The generated question should strictly follow the JSON template format given below. Note that answerA-D should be replaced with actual possible answer choices instead of literally "answerA", the same should be done for "question_1","questions_2","question_3",. In each question, you must always indicate the correct answer by prefixing it with "correct~~", incorrect answers with "incorrect~~", short answer responses with "shortanswer~~". 
     
-    With the set of 20 questions, label each question as "question_1", "question_2", etc. Store the questions and their corresponding answer choices in the following JSON format. Remeber to replace the placeholder text with actual questions and answers you generate based on the context:
-    {{  
-        "quiz_data" : {{
-            "question_1": "Actual_question_text_here",
-            "answers": {{
-                "answer1": "correct~~answerA",
-                "answer2": "incorrect~~answerB",
-                "answer3": "incorrect~~answerC",
-                "answer4": "incorrect~~answerD"
-            }}
-   
-    ...    
-            "question_20": "Actual_question_text_here",
-            "answers": {{
-                "answer1": "incorrect~~answerA",
-                "answer2": "correct~~answerB",
-                "answer3": "incorrect~~answerC",
-                "answer4": "incorrect~~answerD"
-            }}
-        }}
+    With the set of questions that you generated, label each question as "question_1", "question_2", etc. Each question must have 4 answer choices following JSON format. Remeber to replace the placeholder text with actual questions and answers you generate based on the context, do not put questions that you generated into answer choices. :
+   {{
+  "quiz_data": {{
+    "question_1": {{
+      "question": "Actual question text here",
+      "answers": {{
+        "answer1": "correct~~Answer A",
+        "answer2": "incorrect~~Answer B",
+        "answer3": "incorrect~~Answer C",
+        "answer4": "incorrect~~Answer D"
+      }}
+    }},
+    "question_2": {{
+      "question": "…",
+      "answers": {{
+        "answer1": "incorrect~~…",
+        "answer2": "correct~~…",
+        "answer3": "incorrect~~…",
+        "answer4": "incorrect~~…"
+      }}
+    }},
+    ...
+    "question_20": {{
+      "question": "…",
+      "answers": {{
+        "answer1": "incorrect~~…",
+        "answer2": "correct~~…",
+        "answer3": "incorrect~~…",
+        "answer4": "incorrect~~…"
+      }}
     }}
-    ---
+  }}
+}}
 
     """
     #################### Preparing and searching vector database ####################
@@ -132,4 +143,4 @@ def query_data(query_text, class_name=None, subject=None):
     return complete_response
 
 # if __name__ == "__main__":
-#query_data("ch02-questions.md")
+query_data("ch02-questions.md",)
