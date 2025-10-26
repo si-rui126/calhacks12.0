@@ -69,18 +69,27 @@ def query_data(query_text, class_name=None, subject=None):
 
     # Search the database.
     try:
-        results = db.similarity_search_with_relevance_scores(query_text, k=3)
-        if len(results) == 0 or results[0][1] < 0.5:
-            response_text = "Unable to find matching results."
+        results = db.similarity_search_with_relevance_scores(query_text, k=5)  # Increased k for better context
+        if len(results) == 0:
+            response_text = "Unable to find matching results in the vector database. Please upload reference materials first."
             print(response_text)
-            return response_text
+            return {"error": response_text}
+        
+        # Filter results by relevance score
+        relevant_results = [result for result in results if result[1] >= 0.3]  # Lower threshold for more results
+        if len(relevant_results) == 0:
+            response_text = "No relevant content found for the query. Please try a different topic or upload more reference materials."
+            print(response_text)
+            return {"error": response_text}
+            
+        print(f"Found {len(relevant_results)} relevant results for query: {query_text}")
     except Exception as e:
         response_text = f"Error searching database: {str(e)}"
         print(response_text)
-        return response_text
+        return {"error": response_text}
 
     #################### Retrieving and formatting output items ####################
-    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results]) # extracting most relevant context chunk from document database
+    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in relevant_results]) # extracting most relevant context chunk from document database
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE) # formatting prompt template
     prompt = prompt_template.format(context=context_text, question=query_text)
 

@@ -9,7 +9,7 @@ import os
 import shutil
 
 load_dotenv()
-openai.api_ikey = os.environ['OPENAI_API_KEY']
+openai.api_key = os.environ['OPENAI_API_KEY']
 
 DATA_PATH = os.path.join('processing', 'md') # path for markdown files
 CHROMA_PATH = 'chroma'

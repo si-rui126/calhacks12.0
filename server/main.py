@@ -50,8 +50,15 @@ def upload_file_api():
         # Process the file (convert PDF to markdown)
         try:
             pdf_to_md(filename)  # pdf_to_md expects just the filename, not full path
-            result = {"message": f"File {filename} uploaded and processed successfully", "user_id": user_id}
-            print(f"✅ SUCCESS: {filename} processed successfully for user: {user_id}")
+            
+            # Update the vector database with new content
+            print(f"🔄 Updating vector database with new content...")
+            import time
+            time.sleep(1)  # Small delay to avoid file locking issues
+            generate_data_store()
+            
+            result = {"message": f"File {filename} uploaded, processed, and vector database updated successfully", "user_id": user_id}
+            print(f"✅ SUCCESS: {filename} processed and vector database updated for user: {user_id}")
         except Exception as e:
             result = {"error": f"Processing error: {str(e)}"}
             print(f"❌ ERROR: Failed to process {filename} - {str(e)}")
@@ -166,71 +173,71 @@ def chat():
     class_name = data.get("class_name", "")
     subject = data.get("subject", "")
     
-    # ===== FOR DEMO/PROTOTYPE (saves credits) =====
-    # Uncomment below to use the real query_data function:
-    # response = query_data(user_input, class_name, subject)
-    # return jsonify(response)
+    # ===== REAL IMPLEMENTATION =====
+    # Use the real query_data function to call OpenAI API
+    try:
+        response = query_data(user_input, class_name, subject)
+        return jsonify({"response": response})
+    except Exception as e:
+        print(f"❌ ERROR in query_data: {str(e)}")
+        return jsonify({"error": f"Failed to generate quiz: {str(e)}"}), 500
     
-    # Demo response for testing (comment out when using real query_data):
-    from datetime import datetime
-    formatted_response = {
-        "date": datetime.now().strftime("%Y-%m-%d"),
-        "class": class_name,
-        "subject": subject,
-        "quiz_data": {
-            "question_1": {
-                "question": f"What is a key concept in {subject}?",
-                "answers": {
-                    "answer1": "correct~~Option A",
-                    "answer2": "incorrect~~Option B",
-                    "answer3": "incorrect~~Option C",
-                    "answer4": "incorrect~~Option D"
-                }
-            },
-            "question_2": {
-                "question": f"Which of the following relates to {subject}?",
-                "answers": {
-                    "answer1": "incorrect~~Wrong Answer 1",
-                    "answer2": "correct~~Correct Answer",
-                    "answer3": "incorrect~~Wrong Answer 2",
-                    "answer4": "incorrect~~Wrong Answer 3"
-                }
-            },
-            "question_3": {
-                "question": f"In {subject}, what is most important?",
-                "answers": {
-                    "answer1": "incorrect~~Not Important",
-                    "answer2": "incorrect~~Somewhat Important",
-                    "answer3": "correct~~Very Important",
-                    "answer4": "incorrect~~Not Relevant"
-                }
-            },
-            "question_4": {
-                "question": f"What does {subject} teach us?",
-                "answers": {
-                    "answer1": "correct~~Fundamental Concepts",
-                    "answer2": "incorrect~~Nothing Useful",
-                    "answer3": "incorrect~~Only Theory",
-                    "answer4": "incorrect~~Basic Facts"
-                }
-            },
-            "question_5": {
-                "question": f"How is {subject} applied in practice?",
-                "answers": {
-                    "answer1": "incorrect~~It's Not Applied",
-                    "answer2": "incorrect~~Only in Theory",
-                    "answer3": "incorrect~~Rarely Used",
-                    "answer4": "correct~~In Real-World Scenarios"
-                }
-            }
-        }
-    }
-
-    print("user said: "+user_input)
-    print("class:", class_name, "subject:", subject)
-    print("assistant response:", formatted_response)
-
-    return jsonify({"response": formatted_response})
+    # ===== DEMO/PROTOTYPE (saves credits) =====
+    # Uncomment below to use demo responses instead of real OpenAI calls:
+    # from datetime import datetime
+    # formatted_response = {
+    #     "date": datetime.now().strftime("%Y-%m-%d"),
+    #     "class": class_name,
+    #     "subject": subject,
+    #     "quiz_data": {
+    #         "question_1": {
+    #             "question": f"What is a key concept in {subject}?",
+    #             "answers": {
+    #                 "answer1": "correct~~Option A",
+    #                 "answer2": "incorrect~~Option B",
+    #                 "answer3": "incorrect~~Option C",
+    #                 "answer4": "incorrect~~Option D"
+    #             }
+    #         },
+    #         "question_2": {
+    #             "question": f"Which of the following relates to {subject}?",
+    #             "answers": {
+    #                 "answer1": "incorrect~~Wrong Answer 1",
+    #                 "answer2": "correct~~Correct Answer",
+    #                 "answer3": "incorrect~~Wrong Answer 2",
+    #                 "answer4": "incorrect~~Wrong Answer 3"
+    #             }
+    #         },
+    #         "question_3": {
+    #             "question": f"In {subject}, what is most important?",
+    #             "answers": {
+    #                 "answer1": "incorrect~~Not Important",
+    #                 "answer2": "incorrect~~Somewhat Important",
+    #                 "answer3": "correct~~Very Important",
+    #                 "answer4": "incorrect~~Not Relevant"
+    #             }
+    #         },
+    #         "question_4": {
+    #             "question": f"What does {subject} teach us?",
+    #             "answers": {
+    #                 "answer1": "correct~~Fundamental Concepts",
+    #                 "answer2": "incorrect~~Nothing Useful",
+    #                 "answer3": "incorrect~~Only Theory",
+    #                 "answer4": "incorrect~~Basic Facts"
+    #             }
+    #         },
+    #         "question_5": {
+    #             "question": f"How is {subject} applied in practice?",
+    #             "answers": {
+    #                 "answer1": "incorrect~~It's Not Applied",
+    #                 "answer2": "incorrect~~Only in Theory",
+    #                 "answer3": "incorrect~~Rarely Used",
+    #                 "answer4": "correct~~In Real-World Scenarios"
+    #             }
+    #         }
+    #     }
+    # }
+    # return jsonify({"response": formatted_response})
 
 @app.route('/api/pdf_to_md_to_response/<pdf>', methods=['GET'])
 def convert_pdf_to_md_to_response_get(pdf):
