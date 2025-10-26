@@ -26,12 +26,18 @@ except Exception as e:
 def find_session():
     try:
         print("Finding session in database...")
-        result = session_collection.find_one({}, {"session-email": 1})
+        # Fetch the entire document to see all fields
+        result = session_collection.find_one({})
         print(f"Session query result: {result}")
         if result:
+            # Check for session-email field
             email = result.get("session-email")
             print(f"Found session with email: {email}")
-            return {"success": True, "email": email}
+            if email:
+                return {"success": True, "email": email}
+            else:
+                print("Session document exists but has no session-email field")
+                return {"success": False, "error": "No email found in session"}
         else:
             print("No session document found")
             return {"success": False, "error": "No session found"}
@@ -141,7 +147,11 @@ test = {
 #     "password": "Iamcrazygoodatcoding",
 #     "classes": [calculus, english, history]
 }
-#session_collection.insert_one(test)
+
+# Creating session on startup:
+session_collection.delete_many({})  # Clear existing sessions
+session_collection.insert_one(test)
+
 #insert_user(test)
 #delete_user(test["email"])
 #get_user(test["email"])
@@ -213,6 +223,25 @@ def find_session_route():
             return jsonify(result), 404
     except Exception as e:
         print(f"Exception in find_session_route: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/session', methods=['POST'])
+def create_session_route():
+    """ Create or update current session email"""
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        
+        if not email:
+            return jsonify({"success": False, "error": "Email is required"}), 400
+        
+        # Update existing session or create new one
+        session_collection.delete_many({})  # Clear any existing session
+        session_collection.insert_one({"session-email": email})
+        
+        return jsonify({"success": True, "email": email}), 201
+    except Exception as e:
+        print(f"Exception in create_session_route: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 # ============= USER ROUTES =============
