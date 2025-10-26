@@ -9,8 +9,8 @@ function Classroom() {
     const [userEmail, setUserEmail] = useState("");
     const [loading, setLoading] = useState(true);
 
-    const handleSelectClass = (classId) => {
-        navigate("/quiz");
+    const handleSelectClass = (className) => {
+        navigate(`/subject/${className}`);
     };
 
     // Fetch classes from the server
@@ -202,7 +202,7 @@ function Classroom() {
                         classes.map((classItem) => (
                             <button
                                 key={classItem.id}
-                                onClick={() => handleSelectClass(classItem.id)}
+                                onClick={() => handleSelectClass(classItem.name)}
                                 className="classButton"
                             >
                                 <div className={`class-header ${classItem.color}`}>
