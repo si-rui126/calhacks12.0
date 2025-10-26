@@ -9,7 +9,7 @@ function Home() {
 
     return (
         <div>
-            <h2>Kaboot!</h2>
+            <div className="logo">Kaboot!</div>
             <Router>
                 <Routes>
                     <Route path="/" element={<Login />} />

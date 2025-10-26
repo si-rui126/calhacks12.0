@@ -31,9 +31,9 @@
 }
 
 input{
-  background-color: #ddd;
-  color: black;
-  border: 1px solid transparent;
+  background-color: #ffffff;
+  color: #81635a;
+  border: solid;
   border-radius: 15px;
   padding: 12px;
 }

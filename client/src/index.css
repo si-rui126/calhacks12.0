@@ -25,11 +25,9 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-position: 80%;
-  background-image: url('assets\vecteezy_cartoon-cute-background-3d-illustration-rendering-mountain_9930717.jpg');
+  background-image: url('assets\brown-bg.jpg');
 
 }
 
@@ -40,18 +38,19 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 2px solid;
+  color: #81635a;
   padding: 0.6em 1.2em;
   margin: 8px;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #60e896;
+  background-color: #f9f6ec;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #ffffff;
+  box-shadow:5px 5px 0px 2px #81635a;
 }
 button:focus,
 button:focus-visible {

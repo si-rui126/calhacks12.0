@@ -14,17 +14,19 @@ function Login() {
 
     return (
         <div className="menu-cont">
-            <p>
-                Login or Signup
-            </p>
-            <p>
-                <input name="Username" placeholder="username"/>
-            </p>
-            <p>
-                <input name="Password" placeholder="password"/>
-            </p>
-            {/* <button onClick={handleSubmit}>Enter</button> */}
-            <button onClick={handleQuickNav}>Quick Nav</button>
+            <div className="login-cont">
+                <p>
+                    Login or Signup
+                </p>
+                <p>
+                    <input name="Username" placeholder="username"/>
+                </p>
+                <p>
+                    <input name="Password" placeholder="password"/>
+                </p>
+                {/* <button onClick={handleSubmit}>Enter</button> */}
+                <button onClick={handleQuickNav}>Quick Nav</button>
+            </div>
         </div>
 
     );
