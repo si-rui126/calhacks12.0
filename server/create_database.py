@@ -42,9 +42,9 @@ def split_text(documents: list[Document]):
     return chunks
 
 def save_to_chroma(chunks: list[Document]):
-    # Clear out the database first.
-    if os.path.exists(CHROMA_PATH):
-        shutil.rmtree(CHROMA_PATH)
+    # # Clear out the database first.
+    # if os.path.exists(CHROMA_PATH):
+    #     shutil.rmtree(CHROMA_PATH)
 
     # Create a new DB from the documents.
     db = Chroma.from_documents(
