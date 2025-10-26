@@ -4,9 +4,7 @@ import os
 from query_data import query_data
 from processing.pdf_to_md import pdf_to_md
 from create_database import generate_data_store
-
-app = Flask(__name__)
-cors = CORS(app, origins='*')
+from database import app  # Import the Flask app from database.py
 
 @app.route('/')
 def home():
@@ -110,12 +108,13 @@ def chat():
     data = request.get_json()
     user_input = data.get("query", "")
     
+    # ===== FOR DEMO/PROTOTYPE (saves credits) =====
+    # Uncomment below to use the real query_data function:
     # response = query_data(user_input)
     # formatted_response = str(response.content)
-
-    # demo formatted response for testing (so i don't have to spend credits every time)
-    # to be commented out or deleted in final version
-    formatted_response='''
+    
+    # Demo response for testing (comment out when using real query_data):
+    formatted_response = '''
     The answer choices should be stored in this format:
     {
         "_id":{
@@ -141,12 +140,9 @@ def chat():
     '''
 
     print("user said: "+user_input)
-    print("assitant response: "+formatted_response)
+    print("assistant response: "+formatted_response)
 
     return jsonify({"response": formatted_response})
-    
-
-
 
 @app.route('/api/pdf_to_md_to_response/<pdf>', methods=['GET'])
 def convert_pdf_to_md_to_response_get(pdf):

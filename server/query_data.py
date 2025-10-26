@@ -1,6 +1,9 @@
 ## for prompting
 import argparse
-from langchain_community.vectorstores import Chroma
+try:
+    from langchain_chroma import Chroma
+except ImportError:
+    from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts.chat import ChatPromptTemplate
@@ -58,13 +61,23 @@ def query_data(query_text):
     """
     #################### Preparing and searching vector database ####################
     # Prepare the database.
-    embedding_function = OpenAIEmbeddings()
-    db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+    try:
+        embedding_function = OpenAIEmbeddings()
+        db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+    except Exception as e:
+        response_text = f"Error initializing database: {str(e)}"
+        print(response_text)
+        return response_text
 
     # Search the database.
-    results = db.similarity_search_with_relevance_scores(query_text, k=3)
-    if len(results) == 0 or results[0][1] < 0.5:
-        response_text = "Unable to find matching results."
+    try:
+        results = db.similarity_search_with_relevance_scores(query_text, k=3)
+        if len(results) == 0 or results[0][1] < 0.5:
+            response_text = "Unable to find matching results."
+            print(response_text)
+            return response_text
+    except Exception as e:
+        response_text = f"Error searching database: {str(e)}"
         print(response_text)
         return response_text
 
@@ -83,7 +96,4 @@ def query_data(query_text):
     return response_text
 
 # if __name__ == "__main__":
-#     query_data()
-
-# test prompt
-#query_data('Can you tell me about elastic load balancing?')
+#     query_data('Can you tell me about elastic load balancing?')

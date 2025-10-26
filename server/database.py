@@ -15,11 +15,31 @@ try:
     db = client["kaboot"]
     user_collection = db["users"]
     quiz_collection = db["quiz-collection"]
+    session_collection = db['session']
     client.admin.command('ping')
     print("MongoDB connected successfully!")
 except Exception as e:
     print("MongoDB connection error:", e)
 
+
+#find session
+def find_session():
+    try:
+        print("Finding session in database...")
+        result = session_collection.find_one({}, {"session-email": 1})
+        print(f"Session query result: {result}")
+        if result:
+            email = result.get("session-email")
+            print(f"Found session with email: {email}")
+            return {"success": True, "email": email}
+        else:
+            print("No session document found")
+            return {"success": False, "error": "No session found"}
+    except Exception as e:
+            print(f"Session error: {e}")
+            return {"success": False, "error": str(e)}
+
+find_session()
 
 #add user
 def insert_user(user):
@@ -69,15 +89,63 @@ def edit_user(email, subject, new_info):
         print("User edit error:", e)
         return {"success": False, "error": str(e)}
 
+#get user classes
+def get_user_classes(email):
+    try:
+        user = user_collection.find_one({"email": email})
+        if user:
+            classes = user.get("classes", [])
+            return {"success": True, "classes": classes}
+        else:
+            return {"success": False, "error": "User not found"}
+    except Exception as e:
+        print("Get classes error:", e)
+        return {"success": False, "error": str(e)}
+
+#add class to user
+def add_class_to_user(email, class_name):
+    try:
+        # First check if user exists
+        user = user_collection.find_one({"email": email})
+        
+        if not user:
+            return {"success": False, "error": "User not found"}
+        
+        # Check if classes array exists, if not create it
+        if "classes" not in user:
+            user_collection.update_one(
+                {"email": email},
+                {"$set": {"classes": []}}
+            )
+        
+        # Add the class to the classes array
+        result = user_collection.update_one(
+            {"email": email}, 
+            {"$push": {"classes": class_name}}
+        )
+        
+        if result.modified_count > 0:
+            updated_user = user_collection.find_one({"email": email})
+            return {"success": True, "data": updated_user["classes"]}
+        else:
+            return {"success": False, "error": "Failed to add class"}
+    except Exception as e:
+        print("Add class error:", e)
+        return {"success": False, "error": str(e)}
+
+
 # Test functions are commented out since we now have Flask routes
-# test = {
-#     "name": "LlamaGamer69",
+test = {
+        "session-email": "llamagamer69@gmail.com"
 #     "email": "llamagamer69@gmail.com",
-#     "password": "Iamcrazygoodatcoding"
-# }
+#     "password": "Iamcrazygoodatcoding",
+#     "classes": [calculus, english, history]
+}
+#session_collection.insert_one(test)
 #insert_user(test)
 #delete_user(test["email"])
 #get_user(test["email"])
+
 
 #add quiz
 def insert_quiz(quiz):
@@ -130,6 +198,23 @@ def edit_quiz(quiz_id, subject, new_info):
 
 # ============= FLASK ROUTES =============
 
+@app.route('/api/session', methods=['GET'])
+def find_session_route():
+    """ Get current session email"""
+    print("Session route called")
+    try:
+        result = find_session()
+        print(f"find_session result: {result}")
+        if result.get('success'):
+            print("success in finding session")
+            return jsonify(result)
+        else:
+            print("session not found, returning 404")
+            return jsonify(result), 404
+    except Exception as e:
+        print(f"Exception in find_session_route: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
 # ============= USER ROUTES =============
 
 @app.route('/api/users', methods=['POST'])
@@ -181,6 +266,36 @@ def delete_user_route(email):
     """Delete user by email"""
     try:
         result = delete_user(email)
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/users/<email>/classes', methods=['GET'])
+def get_classes_route(email):
+    """Get user's classes"""
+    try:
+        result = get_user_classes(email)
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 404
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/users/<email>/classes', methods=['POST'])
+def add_class_route(email):
+    """Add a class to user's classes array"""
+    try:
+        data = request.get_json()
+        class_name = data.get('class_name')
+        
+        if not class_name:
+            return jsonify({"success": False, "error": "Missing 'class_name' in request"}), 400
+        
+        result = add_class_to_user(email, class_name)
         if result['success']:
             return jsonify(result), 200
         else:

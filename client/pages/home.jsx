@@ -3,18 +3,20 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Login from "./login";
 import Classroom from "./classroom";
 import Subject from "./subject";
-import Quiz from "./quiz";
+import Quiz from "./gamescreen";
 
 function Home() {
     return (
         <div>
             <h2>Kaboot!</h2>
-            <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/classroom" element={<Classroom />} />
-                <Route path="/subject" element={<Subject />} />
-                <Route path="/quiz" element={<Quiz />} />
-            </Routes>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<Login />} />
+                    <Route path="/classroom" element={<Classroom />} />
+                    <Route path="/subject/:classes" element={<Subject />} />
+                    <Route path="/gamescreen" element={<Quiz />} />
+                </Routes>
+            </Router>
         </div>
     );
 }
