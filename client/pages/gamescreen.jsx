@@ -176,37 +176,105 @@ const GameScreenWrapper = () => {
   const [questions, setQuestions] = useState(null);
 
   useEffect(() => {
-    // Get class and subject from session storage or navigation state
-    const className = sessionStorage.getItem('selectedClass') || 'Unknown Class';
-    const subject = sessionStorage.getItem('selectedSubject') || 'General';
-    
-    console.log('Class:', className, 'Subject:', subject);
-    
-    // Generate demo questions for testing
-    // In production, fetch from API
-    const demoQuestions = [
-      {
-        question: "What is the capital of France?",
-        options: ["London", "Berlin", "Paris", "Madrid"],
-        answer: "Paris"
-      },
-      {
-        question: "Which planet is known as the Red Planet?",
-        options: ["Venus", "Mars", "Jupiter", "Saturn"],
-        answer: "Mars"
-      },
-      {
-        question: "What is 2 + 2?",
-        options: ["3", "4", "5", "6"],
-        answer: "4"
+    const fetchQuizData = async () => {
+      try {
+        // Get quiz ID from session storage
+        const quizId = sessionStorage.getItem('quizId');
+        const className = sessionStorage.getItem('selectedClass') || 'Unknown Class';
+        const subject = sessionStorage.getItem('selectedSubject') || 'General';
+        
+        console.log('Class:', className, 'Subject:', subject, 'Quiz ID:', quizId);
+        
+        if (!quizId) {
+          console.error('No quiz ID found in session storage');
+          // Clear session storage and redirect to classroom
+          sessionStorage.removeItem('selectedClass');
+          sessionStorage.removeItem('selectedSubject');
+          sessionStorage.removeItem('quizId');
+          navigate('/classroom');
+          return;
+        }
+
+        // Fetch quiz data from database
+        const response = await fetch(`http://localhost:8080/api/quizzes/${quizId}`);
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.quiz_data) {
+          // Transform quiz data to the format expected by GameScreen
+          const transformedQuestions = Object.entries(data.data.quiz_data).map(([key, questionData]) => {
+            const answers = Object.values(questionData.answers);
+            const correctAnswer = answers.find(answer => answer.startsWith('correct~~'));
+            const incorrectAnswers = answers.filter(answer => answer.startsWith('incorrect~~'));
+            
+            // Clean up answer text (remove prefixes)
+            const cleanAnswers = answers.map(answer => answer.replace(/^(correct~~|incorrect~~|shortanswer~~)/, ''));
+            
+            return {
+              question: questionData.question,
+              options: cleanAnswers,
+              answer: correctAnswer ? correctAnswer.replace('correct~~', '') : cleanAnswers[0]
+            };
+          });
+          
+          console.log('Transformed questions:', transformedQuestions);
+          setQuestions(transformedQuestions);
+        } else {
+          console.error('Failed to fetch quiz data:', data);
+          // Fallback to demo questions if fetch fails
+          const demoQuestions = [
+            {
+              question: "What is the capital of France?",
+              options: ["London", "Berlin", "Paris", "Madrid"],
+              answer: "Paris"
+            },
+            {
+              question: "Which planet is known as the Red Planet?",
+              options: ["Venus", "Mars", "Jupiter", "Saturn"],
+              answer: "Mars"
+            },
+            {
+              question: "What is 2 + 2?",
+              options: ["3", "4", "5", "6"],
+              answer: "4"
+            }
+          ];
+          setQuestions(demoQuestions);
+        }
+      } catch (error) {
+        console.error('Error fetching quiz data:', error);
+        // Fallback to demo questions on error
+        const demoQuestions = [
+          {
+            question: "What is the capital of France?",
+            options: ["London", "Berlin", "Paris", "Madrid"],
+            answer: "Paris"
+          },
+          {
+            question: "Which planet is known as the Red Planet?",
+            options: ["Venus", "Mars", "Jupiter", "Saturn"],
+            answer: "Mars"
+          },
+          {
+            question: "What is 2 + 2?",
+            options: ["3", "4", "5", "6"],
+            answer: "4"
+          }
+        ];
+        setQuestions(demoQuestions);
+      } finally {
+        setLoading(false);
       }
-    ];
-    
-    setQuestions(demoQuestions);
-    setLoading(false);
+    };
+
+    fetchQuizData();
   }, []);
 
   const handleGameEnd = (finalScore) => {
+    // Clear session storage
+    sessionStorage.removeItem('selectedClass');
+    sessionStorage.removeItem('selectedSubject');
+    sessionStorage.removeItem('quizId');
+    
     alert(`Quiz Complete! Your final score is: ${finalScore}`);
     navigate('/classroom');
   };

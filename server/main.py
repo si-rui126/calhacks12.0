@@ -123,21 +123,48 @@ def chat():
         "subject": subject,
         "quiz_data": {
             "question_1": {
-                "question": "What is the capital of France?",
+                "question": f"What is a key concept in {subject}?",
                 "answers": {
-                    "answer1": "correct~~Paris",
-                    "answer2": "incorrect~~London",
-                    "answer3": "incorrect~~Berlin",
-                    "answer4": "incorrect~~Madrid"
+                    "answer1": "correct~~Option A",
+                    "answer2": "incorrect~~Option B",
+                    "answer3": "incorrect~~Option C",
+                    "answer4": "incorrect~~Option D"
                 }
             },
             "question_2": {
-                "question": "What is 2 + 2?",
+                "question": f"Which of the following relates to {subject}?",
                 "answers": {
-                    "answer1": "incorrect~~3",
-                    "answer2": "correct~~4",
-                    "answer3": "incorrect~~5",
-                    "answer4": "incorrect~~6"
+                    "answer1": "incorrect~~Wrong Answer 1",
+                    "answer2": "correct~~Correct Answer",
+                    "answer3": "incorrect~~Wrong Answer 2",
+                    "answer4": "incorrect~~Wrong Answer 3"
+                }
+            },
+            "question_3": {
+                "question": f"In {subject}, what is most important?",
+                "answers": {
+                    "answer1": "incorrect~~Not Important",
+                    "answer2": "incorrect~~Somewhat Important",
+                    "answer3": "correct~~Very Important",
+                    "answer4": "incorrect~~Not Relevant"
+                }
+            },
+            "question_4": {
+                "question": f"What does {subject} teach us?",
+                "answers": {
+                    "answer1": "correct~~Fundamental Concepts",
+                    "answer2": "incorrect~~Nothing Useful",
+                    "answer3": "incorrect~~Only Theory",
+                    "answer4": "incorrect~~Basic Facts"
+                }
+            },
+            "question_5": {
+                "question": f"How is {subject} applied in practice?",
+                "answers": {
+                    "answer1": "incorrect~~It's Not Applied",
+                    "answer2": "incorrect~~Only in Theory",
+                    "answer3": "incorrect~~Rarely Used",
+                    "answer4": "correct~~In Real-World Scenarios"
                 }
             }
         }

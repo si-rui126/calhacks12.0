@@ -46,22 +46,38 @@ function Subject() {
             console.log("Quiz created:", data);
 
             if (data.response && data.response.quiz_data) {
+                // Generate unique quiz ID
+                const quizId = `${className}_${subject}_${Date.now()}`;
+                
+                // Prepare quiz data with ID
+                const quizData = {
+                    ...data.response,
+                    quiz_id: quizId
+                };
+
                 // Save quiz to database
                 const saveResponse = await fetch('http://localhost:8080/api/quizzes', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data.response),
+                    body: JSON.stringify(quizData),
                 });
 
                 const saveData = await saveResponse.json();
                 console.log("Quiz saved:", saveData);
 
-                alert(`Quiz created successfully for ${subject}!`);
-                
-                // Clear subject and go back
-                setSubject("");
+                if (saveData.success) {
+                    // Store quiz ID and navigate to gamescreen
+                    sessionStorage.setItem('selectedClass', className);
+                    sessionStorage.setItem('selectedSubject', subject);
+                    sessionStorage.setItem('quizId', quizId);
+                    
+                    // Navigate to gamescreen
+                    navigate('/gamescreen');
+                } else {
+                    setError("Failed to save quiz. Please try again.");
+                }
             } else {
                 setError("Failed to create quiz. Please try again.");
             }
