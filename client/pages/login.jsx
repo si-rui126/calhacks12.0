@@ -3,13 +3,9 @@ import "./style.css";
 
 function Login() {
     const navigate = useNavigate();
-    const handleQuickNav = () => {
-        navigate("/gamescreen");
+    const handleSubmit = () => {
+        navigate("/classroom");
     };
-
-    // const handleSubmit = () => {
-    //     navigate("/classroom");
-    // };
 
 
     return (
@@ -25,7 +21,7 @@ function Login() {
                     <input name="Password" placeholder="password"/>
                 </p>
                 {/* <button onClick={handleSubmit}>Enter</button> */}
-                <button onClick={handleQuickNav}>Quick Nav</button>
+                <button onClick={handleSubmit}>Enter</button>
             </div>
         </div>
 

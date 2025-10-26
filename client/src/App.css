@@ -4,6 +4,14 @@
   width: -webkit-fill-available;
 }
 
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  background-image: url('assets\brown-bg.jpg');
+}
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -24,6 +32,12 @@
   src: url('src/assets/fonts/Hey Comic.otf') format('onetype');
   font-weight: normal;
   font-style: normal;
+}
+
+.logo{
+  color: #58433d;
+  font-family: 'LogoFont', sans-serif;
+  font-size: 75px;
 }
 
 .card {
@@ -47,3 +61,25 @@
   box-sizing: border-box;
   box-shadow: 5px black;
 }
+
+button {
+  border-radius: 8px;
+  border: 2px solid;
+  color: #81635a;
+  padding: 0.6em 1.2em;
+  margin: 8px;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #f9f6ec;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  box-shadow:5px 5px 0px 2px #81635a;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
