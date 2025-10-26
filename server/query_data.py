@@ -96,4 +96,4 @@ def query_data(query_text):
     return response_text
 
 # if __name__ == "__main__":
-query_data("/processing/md/ch02-questions.md")
+query_data("ch02-questions.md")
