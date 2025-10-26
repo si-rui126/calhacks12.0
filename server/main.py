@@ -80,7 +80,7 @@ def convert_pdf_to_md_to_response():
             
             # Query the data
             print(f"🤖 Querying data for {filename}...")
-            result = query_data("Generate practice questions from the uploaded content")
+            result = query_data("Generate practice questions from the uploaded content", class_name="", subject="")
             
             response_data = {
                 "message": f"Converted {filename} to markdown and queried data successfully.",
@@ -107,40 +107,45 @@ def convert_pdf_to_md_to_response():
 def chat():
     data = request.get_json()
     user_input = data.get("query", "")
+    class_name = data.get("class_name", "")
+    subject = data.get("subject", "")
     
     # ===== FOR DEMO/PROTOTYPE (saves credits) =====
     # Uncomment below to use the real query_data function:
-    # response = query_data(user_input)
-    # formatted_response = str(response.content)
+    # response = query_data(user_input, class_name, subject)
+    # return jsonify(response)
     
     # Demo response for testing (comment out when using real query_data):
-    formatted_response = '''
-    The answer choices should be stored in this format:
-    {
-        "_id":{
-            "$oid": "68facaasdkfl"
-        },
-        "date": "10/25/2025",
-        "subject": "calculus 3",
-        "quiz_data":{
-            "question_1":{
-                "answer1": "~~correct~~answer1",
-                "answer2": "~incorrect~~answer2",
-                "answer3": "~~incorrect~~answer3",
-                "answer4": "~~incorrect~~answer4",
+    from datetime import datetime
+    formatted_response = {
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "class": class_name,
+        "subject": subject,
+        "quiz_data": {
+            "question_1": {
+                "question": "What is the capital of France?",
+                "answers": {
+                    "answer1": "correct~~Paris",
+                    "answer2": "incorrect~~London",
+                    "answer3": "incorrect~~Berlin",
+                    "answer4": "incorrect~~Madrid"
+                }
             },
-            "question_2":{
-                "answer1": "~~correct~~answer1",
-                "answer2": "~incorrect~~answer2",
-                "answer3": "~~incorrect~~answer3",
-                "answer4": "~~incorrect~~answer4",
+            "question_2": {
+                "question": "What is 2 + 2?",
+                "answers": {
+                    "answer1": "incorrect~~3",
+                    "answer2": "correct~~4",
+                    "answer3": "incorrect~~5",
+                    "answer4": "incorrect~~6"
+                }
             }
         }
     }
-    '''
 
     print("user said: "+user_input)
-    print("assistant response: "+formatted_response)
+    print("class:", class_name, "subject:", subject)
+    print("assistant response:", formatted_response)
 
     return jsonify({"response": formatted_response})
 
@@ -154,7 +159,7 @@ def convert_pdf_to_md_to_response_get(pdf):
 
     try:
         # call the query_data function imported from query_data
-        result = query_data()
+        result = query_data("Generate practice questions", class_name="", subject="")
     except Exception as e:
         return jsonify({"error": f"Query error: {str(e)}"}), 500
 

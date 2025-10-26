@@ -171,10 +171,17 @@ const GameScreen = ({ questions, onGameEnd }) => {
 // Wrapper component for direct route usage
 const GameScreenWrapper = () => {
   const navigate = useNavigate();
+  const location = window.location; // Access location for state
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState(null);
 
   useEffect(() => {
+    // Get class and subject from session storage or navigation state
+    const className = sessionStorage.getItem('selectedClass') || 'Unknown Class';
+    const subject = sessionStorage.getItem('selectedSubject') || 'General';
+    
+    console.log('Class:', className, 'Subject:', subject);
+    
     // Generate demo questions for testing
     // In production, fetch from API
     const demoQuestions = [

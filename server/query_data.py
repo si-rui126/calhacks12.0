@@ -20,7 +20,7 @@ from rake_nltk import Rake
 import re
 
 ################### query data function ###################
-def query_data(query_text):
+def query_data(query_text, class_name=None, subject=None):
     load_dotenv()
     openai.api_key = os.environ['OPENAI_API_KEY'] # Fetch API key
 
@@ -36,22 +36,22 @@ def query_data(query_text):
     With the set of 20 questions, label each question as "question_1", "question_2", etc. Store the questions and their corresponding answer choices in the following JSON format. Remeber to replace the placeholder text with actual questions and answers you generate based on the context:
     {{  
         "quiz_data" : {{
-            "question_1": {{
-        "question": "Actual_question_text_here",
-        "answers": {{
-            "answer1": "correct~~answerA",
-            "answer2": "incorrect~~answerB",
-            "answer3": "incorrect~~answerC",
-            "answer4": "incorrect~~answerD"
-        }}
-    }},
-    ...    "question_20": {{
-        "question": "Actual_question_text_here",
-        "answers": {{
-            "answer1": "incorrect~~answerA",
-            "answer2": "correct~~answerB",
-            "answer3": "incorrect~~answerC",
-            "answer4": "incorrect~~answerD"
+            "question_1": "Actual_question_text_here",
+            "answers": {{
+                "answer1": "correct~~answerA",
+                "answer2": "incorrect~~answerB",
+                "answer3": "incorrect~~answerC",
+                "answer4": "incorrect~~answerD"
+            }}
+   
+    ...    
+            "question_20": "Actual_question_text_here",
+            "answers": {{
+                "answer1": "incorrect~~answerA",
+                "answer2": "correct~~answerB",
+                "answer3": "incorrect~~answerC",
+                "answer4": "incorrect~~answerD"
+            }}
         }}
     }}
     ---
@@ -88,10 +88,39 @@ def query_data(query_text):
     model = ChatOpenAI(max_tokens=2000) # initializing OpenAI model
     response_text = model.invoke(prompt) # querying response from model using formatted prompt
     formatted_response = response_text.content
+   
+    # Parse the formatted response (should be valid JSON)
+    try:
+        quiz_data_json = json.loads(formatted_response)
+    except json.JSONDecodeError:
+        # If it's not valid JSON, try to extract JSON from the response
+        import re
+        json_match = re.search(r'\{.*\}', formatted_response, re.DOTALL)
+        if json_match:
+            quiz_data_json = json.loads(json_match.group())
+        else:
+            return {"error": "Invalid response format from OpenAI"}
+    
+    # Add header information with date, class, and subject
+    from datetime import datetime
+    
+    header_json = {
+        "date": datetime.now().strftime("%Y-%m-%d"),  # Current date in YYYY-MM-DD format
+        "class": class_name if class_name else "",  # Class from user input
+        "subject": subject if subject else ""  # Subject from user input
+    }
+    
+    # Merge header with quiz data to create complete response
+    complete_response = {
+        "date": header_json["date"],
+        "class": header_json["class"],
+        "subject": header_json["subject"],
+        "quiz_data": quiz_data_json.get("quiz_data", {})
+    }
 
-    print(formatted_response)
+    print("Complete response:", complete_response)
 
-    return response_text
+    return complete_response
 
 # if __name__ == "__main__":
 #query_data("ch02-questions.md")
