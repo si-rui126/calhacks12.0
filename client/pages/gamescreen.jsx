@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TriangleIcon, DiamondIcon, CircleIcon, SquareIcon } from '../component/icons';
 
 const QUESTION_TIME = 20;
@@ -19,6 +20,18 @@ const GameScreen = ({ questions, onGameEnd }) => {
   const [showFeedback, setShowFeedback] = useState(false);
 
   const timerRef = useRef(null);
+
+  // Safety check: ensure questions exists
+  if (!questions || !Array.isArray(questions) || questions.length === 0) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-gray-900 text-white">
+        <div className="text-center">
+          <h2 className="text-2xl mb-4">No questions available</h2>
+          <p className="text-gray-400">Please generate a quiz first.</p>
+        </div>
+      </div>
+    );
+  }
 
   const startTimer = useCallback(() => {
     timerRef.current = setInterval(() => {
@@ -155,4 +168,51 @@ const GameScreen = ({ questions, onGameEnd }) => {
   );
 };
 
-export default GameScreen;
+// Wrapper component for direct route usage
+const GameScreenWrapper = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [questions, setQuestions] = useState(null);
+
+  useEffect(() => {
+    // Generate demo questions for testing
+    // In production, fetch from API
+    const demoQuestions = [
+      {
+        question: "What is the capital of France?",
+        options: ["London", "Berlin", "Paris", "Madrid"],
+        answer: "Paris"
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Venus", "Mars", "Jupiter", "Saturn"],
+        answer: "Mars"
+      },
+      {
+        question: "What is 2 + 2?",
+        options: ["3", "4", "5", "6"],
+        answer: "4"
+      }
+    ];
+    
+    setQuestions(demoQuestions);
+    setLoading(false);
+  }, []);
+
+  const handleGameEnd = (finalScore) => {
+    alert(`Quiz Complete! Your final score is: ${finalScore}`);
+    navigate('/classroom');
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-gray-900 text-white">
+        <h2 className="text-2xl">Loading quiz...</h2>
+      </div>
+    );
+  }
+
+  return <GameScreen questions={questions} onGameEnd={handleGameEnd} />;
+};
+
+export default GameScreenWrapper;
