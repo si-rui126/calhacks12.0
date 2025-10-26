@@ -12,6 +12,7 @@ function Quiz() {
     return (
         <div>
             <h2>Quiz for {id}</h2>
+            <button>Create New Quiz</button>
             <p>question 1</p>
             <button onClick={handleSubmitBack}>Back</button>
             <button>Next</button>
